@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.env
+.env
+.venv/
+env/
+venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Submodules / cloned tools (if not intended to track python-clients)
+# python-clients/
+
+# Audio outputs / recordings (optional)
+# *.wav
+# *.ogg
