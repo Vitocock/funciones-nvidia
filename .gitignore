@@ -19,5 +19,9 @@ video/models/
 *.webm
 *.mp4
 outputs/
+python-clients/
+voice/python-clients/
+
+
 
 
