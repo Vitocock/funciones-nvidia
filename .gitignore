@@ -1,21 +1,23 @@
+# Environment variables
+.env
+.env.local
+
 # Python
 __pycache__/
 *.py[cod]
 *$py.class
-*.env
-.env
 .venv/
 env/
 venv/
 
-# IDE
-.vscode/
-.idea/
-*.swp
+# MediaPipe models and generated artifacts
+*.task
+models/
+video/models/
+*_frames/
+*.wav
+*.webm
+*.mp4
+outputs/
 
-# Submodules / cloned tools (if not intended to track python-clients)
-# python-clients/
 
-# Audio outputs / recordings (optional)
-# *.wav
-# *.ogg

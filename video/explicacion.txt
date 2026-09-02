@@ -1,0 +1,65 @@
+Eje 1: Contacto Visual (Gaze Tracking)
+Mide si el vocero sostiene la mirada hacia la lente de la cámara en lugar de mirar hacia la pantalla, el teclado o los costados.  
+
+Landmarks utilizados (Face Mesh):
+    Centro del iris izquierdo (punto 468) y derecho (punto 473).
+    Esquinas internas y externas de los párpados: ojo izquierdo (puntos 33 y 133), ojo derecho (puntos 362 y 263).
+    Párpados superior e inferior (apertura vertical): ojo izquierdo (puntos 159 y 145), ojo derecho (puntos 386 y 374).
+
+Fórmula de cálculo por fotograma:
+
+    Ratio horizontal del iris ($R_x$): Posición relativa del iris respecto a las esquinas del ojo:
+    R_x = (x_iris - x_esquina_interna) / (x_esquina_externa - x_esquina_interna)
+    Condición de contacto: Si 0.40 < R_x < 0.60 en ambos ojos (y la apertura vertical indica ojos abiertos), el frame cuenta como mirada directa.
+    
+Métrica agregada para la rúbrica (AN-7):  
+    Score contacto visual = (frames_con_la_mirada_en_camara / total_frames_procesados) * 100
+
+Eje 2: Postura y Alineación Corporal (Posture & Head Alignment)
+Mide la compostura física, evitando que el vocero se encorve, ladee la cabeza en exceso o se incline de lado por fatiga o inseguridad. 
+
+Landmarks utilizados:
+
+    MediaPipe Pose: Hombro izquierdo (punto 11) y hombro derecho (punto 12).
+    MediaPipe Face Mesh: Nariz (punto 1) y mentón (punto 152) para la inclinación de la cabeza.
+
+Métricas calculadas:
+
+    Simetría de hombros: Inclinación angular respecto al plano horizontal:
+    teta_hombros = arctan((y12 - y11) / (x12 - x11))
+    Un valor teta_hombros <= 5° indica hombros rectos; valores superiores a 10° revelan desbalance corporal.
+    Ladeo de cabeza (Head Roll): Ángulo entre el puente nasal y el mentón respecto a la vertical. Desviaciones continuas $> 8^\circ$ denotan falta de firmeza o rigidez forzada. 
+
+Eje 3: Microexpresiones y Tensión Facial (Action Units / Blendshapes)
+Detecta gestos involuntarios asociados a estrés, enojo contenido, agresividad o incomodidad ante preguntas hostiles. MediaPipe entrega 52 Blendshapes normalizados de $0.0$ a $1.0$.  
+
+Variables clave a monitorear:
+    Tensión en el ceño (AU4 / Brow Down): Promedio de browDownLeft y browDownRight. Coeficientes $> 0.35$ sostenidos revelan frustración o tensión excesiva frente al entrevistador.  
+    Presión labial (AU24 / Mouth Press): Promedio de mouthPressLeft y mouthPressRight. Denota contención de palabras o desacuerdo no verbal.  
+    Tasa de parpadeo anormal: Frecuencia de frames donde eyeBlinkLeft y eyeBlinkRight superan $0.60$. Más de 30 parpadeos por minuto reflejan ansiedad; menos de 10 indican mirada congelada.
+
+Eje 4: Estabilidad y Presencia frente a Cámara
+Mide el grado de inquietud motora (swaying) o balanceo lateral involuntario del torso a lo largo de la entrevista. 
+    Cálculo temporal entre fotogramas:
+        -Registra la coordenada central de la cara $(x_c, y_c)$ en cada frame $t$.
+        -Calcula la desviación estándar espacial:
+        sigma_x = sqrt(1/N * sum((x_c,t - x_c_mean)^2))
+        Si sigma_x supera el umbral de tolerancia, significa que el vocero se balancea de izquierda a derecha en la silla por nerviosismo.
+        
+
+Estructura de Salida JSON de la Función
+La función ejecutada en el contenedor debe consolidar estas métricas en un payload estructurado para enviarlo a la capa de fusión (AN-8, DB-5):  
+
+{
+  "total_frames_analizados": 90,
+  "metricas_ejes": {
+    "contacto_visual_porcentaje": 82.2,
+    "desvios_mirada_total": 16,
+    "alineacion_hombros_grados_promedio": 3.4,
+    "ladeo_cabeza_grados_promedio": 4.1,
+    "indice_tension_facial": 0.18,
+    "tasa_parpadeo_por_minuto": 22.0,
+    "estabilidad_balanceo_score": 94.0
+  },
+  "score_area_expresion": 84.5
+}

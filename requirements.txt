@@ -1,1 +1,14 @@
+# Dependencias para separar audio/video
+imageio-ffmpeg>=0.5.0
+ffmpeg-python>=0.2.0
+
+# Dependencias para evaluador de video (MediaPipe & CV)
+mediapipe>=1.0.0
+opencv-python>=4.8.0
+
+# Dependencias para evaluador de voz (NVIDIA Riva & Acústica)
 nvidia-riva-client>=2.14.0
+numpy>=1.24.0
+
+# Gestión de variables de entorno
+python-dotenv>=1.0.0
